@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Thêm Category</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+
+<body>
+<section layout:fragment="content" class="container mt-5">
+
+    <h2 class="mb-4">Thêm Danh Mục</h2>
+
+    <!-- ⚠️ PHẢI CÓ multipart -->
+    <form th:action="@{/categories/add}"
+          th:object="${category}"
+          method="post"
+          enctype="multipart/form-data">
+
+        <!-- Tên -->
+        <div class="mb-3">
+            <label class="form-label">Tên Category</label>
+            <input type="text"
+                   th:field="*{name}"
+                   class="form-control">
+            <div class="text-danger"
+                 th:if="${#fields.hasErrors('name')}"
+                 th:errors="*{name}"></div>
+        </div>
+
+        <!-- Icon -->
+        <div class="mb-3">
+            <label class="form-label">Icon danh mục</label>
+            <input type="file"
+                   name="iconFile"
+                   class="form-control"
+                   accept="image/*">
+            <small class="text-muted">
+                Chọn ảnh PNG / SVG (24x24 hoặc 32x32)
+            </small>
+        </div>
+
+        <button class="btn btn-primary">Lưu</button>
+    </form>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

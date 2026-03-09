@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <title layout:title-pattern="TGDĐ">TGDĐ</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        /* ================= RESET ================= */
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #b30000;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* ================= HEADER ================= */
+        .tgd-header {
+            background: #ffd400;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 999;
+            box-shadow: 0 2px 6px rgba(0,0,0,.15);
+        }
+
+        .header-space {
+            height: 145px;
+        }
+
+        .tgd-logo {
+            font-size: 26px;
+            font-weight: 900;
+            color: #000;
+            text-transform: lowercase;
+        }
+
+        /* SEARCH */
+        .tgd-search {
+            flex: 1;
+            max-width: 520px;
+            background: #fff;
+            border-radius: 30px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 0 0 1px #eee;
+        }
+
+        .tgd-search i {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .tgd-search input {
+            border: none;
+            outline: none;
+            width: 100%;
+            margin-left: 8px;
+            font-size: 14px;
+        }
+
+        /* ACTIONS */
+        .tgd-actions a {
+            margin-left: 18px;
+            color: #000;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+
+        /* ================= CATEGORY BAR ================= */
+        .tgd-category-bar {
+            background: #ffd400;
+            border-top: 1px solid #f1c400;
+        }
+
+        .tgd-category-item {
+            padding: 10px 8px;
+            color: #000;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .tgd-category-item i {
+            font-size: 16px;
+        }
+
+        .tgd-category-item:hover {
+            color: #d70018;
+        }
+
+        /* ================= RED BACKGROUND ================= */
+        .red-wrapper {
+            background: linear-gradient(#c40000, #b30000);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* ================= CONTAINER ================= */
+        .red-wrapper .container {
+            max-width: 1300px;
+            padding-left: 32px;
+            padding-right: 32px;
+        }
+
+        /* ================= BANNER ================= */
+        .tgd-banner img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.25);
+        }
+
+        /* ================= SIDE BANNER ================= */
+        .side-banner {
+            position: fixed;
+            top: 190px;
+            width: 130px;
+            z-index: 10;
+        }
+
+        .side-banner img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.3);
+            transition: transform .2s ease;
+        }
+
+        .side-banner img:hover {
+            transform: translateY(-6px);
+        }
+
+        .side-banner.left {
+            left: calc((100vw - 1300px) / 2 - 150px);
+        }
+
+        .side-banner.right {
+            right: calc((100vw - 1300px) / 2 - 150px);
+        }
+
+        /* ================= CONTENT ================= */
+        .content-card {
+            background: transparent;
+            padding: 0;
+        }
+
+        /* ================= PRODUCT CARD (DÙNG SAU) ================= */
+        .product-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.1);
+        }
+
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 1400px) {
+            .side-banner {
+                width: 110px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .side-banner {
+                display: none;
+            }
+
+            .red-wrapper .container {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tgd-search {
+                display: none;
+            }
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px;
+            height: 100%;                 /* QUAN TRỌNG */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;                /* CỐ ĐỊNH ẢNH */
+            object-fit: contain;          /* KHÔNG MÉO */
+            margin-bottom: 12px;
+        }
+
+        .product-info {
+            flex-grow: 1;                 /* ĐẨY NỘI DUNG ĐỀU */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .flash-sale {
+            background: linear-gradient(90deg, #b80000, #e60000);
+            border-radius: 16px;
+            padding: 16px 20px;
+            color: #fff;
+        }
+
+        .flash-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .flash-icon {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .countdown {
+            background: #fff;
+            color: #d60000;
+            font-weight: bold;
+            font-size: 18px;
+            padding: 8px 14px;
+            border-radius: 12px;
+        }
+
+        .countdown span {
+            display: inline-block;
+            min-width: 26px;
+            text-align: center;
+        }
+
+        .tgd-category-wrapper {
+            position: relative;
+        }
+
+        .tgd-accessory-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 900px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .tgd-category-wrapper:hover .tgd-accessory-menu {
+            display: block;
+        }
+
+        /* GRID ICON */
+        .accessory-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 18px;
+        }
+
+        .accessory-grid a {
+            text-align: center;
+            color: #000;
+            font-size: 13px;
+        }
+
+        .accessory-grid img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            margin-bottom: 6px;
+        }
+
+
+
+    </style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="tgd-header">
+
+    <div class="container py-2 d-flex align-items-center gap-3">
+        <a class="tgd-logo" th:href="@{/}">
+            thegioididong
+        </a>
+
+        <div class="tgd-search">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="iPhone 17 và iPhone Air">
+        </div>
+
+        <div class="tgd-actions ms-auto">
+            <a th:href="@{/login}">
+                <i class="bi bi-person"></i> Đăng nhập
+            </a>
+            <a th:href="@{/cart}">
+                <i class="bi bi-cart"></i> Giỏ hàng
+            </a>
+            <a href="#">
+                <i class="bi bi-geo-alt"></i> Hồ Chí Minh
+            </a>
+        </div>
+    </div>
+
+    <div class="tgd-category-bar">
+        <div class="container d-flex gap-4">
+
+            <a class="tgd-category-item" href="#">
+                <i class="bi bi-phone"></i> Điện thoại
+            </a>
+
+            <a class="tgd-category-item" href="#">
+                <i class="bi bi-laptop"></i> Laptop
+            </a>
+
+            <!-- PHỤ KIỆN -->
+            <div class="tgd-category-wrapper">
+
+                <a class="tgd-category-item" href="#">
+                    <i class="bi bi-headphones"></i> Phụ kiện
+                </a>
+
+                <!-- MENU ICON XỔ -->
+                <div class="tgd-accessory-menu">
+                    <div class="accessory-grid">
+
+                        <a th:each="cat : ${categories}"
+                           th:if="${cat.iconPath != null}"
+                           href="#">
+
+                            <img th:src="@{'/images/category/' + ${cat.iconPath} + '?v=' + ${#dates.createNow().time}}"
+                                 alt=""
+                                 width="42"
+                                 height="42"
+                                 style="object-fit:contain;"
+                                 onerror="this.src='https://via.placeholder.com/42'">
+
+                            <span th:text="${cat.name}"></span>
+
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <a class="tgd-category-item" href="#">
+                <i class="bi bi-smartwatch"></i> Smartwatch
+            </a>
+
+            <a class="tgd-category-item" href="#">
+                <i class="bi bi-tablet"></i> Tablet
+            </a>
+
+        </div>
+    </div>
+
+</header>
+
+<div class="header-space"></div>
+
+<!-- ================= RED BACKGROUND ================= -->
+<div class="red-wrapper">
+
+    <!-- SIDE BANNERS -->
+    <div class="side-banner left">
+        <img src="/images/banner/banner-left.jpg">
+    </div>
+
+    <div class="side-banner right">
+        <img src="/images/banner/banner_right.png">
+    </div>
+
+    <!-- MAIN BANNER -->
+    <div class="container mt-3">
+        <div class="tgd-banner">
+            <img src="/images/banner/banner1.jpg">
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="container mt-4">
+        <section layout:fragment="content" class="content-card">
+            <!-- Nội dung trang -->
+        </section>
+    </main>
+</div>
+
+<footer class="text-center py-3 text-white">
+    © 2026 — Thế Giới Di Động
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+<script>
+    function createSakura() {
+        const sakura = document.createElement("div");
+        sakura.classList.add("sakura");
+        sakura.innerHTML = "🌸";   // emoji hoa anh đào
+
+        sakura.style.left = Math.random() * window.innerWidth + "px";
+        sakura.style.animationDuration = (Math.random() * 5 + 5) + "s";
+
+        document.body.appendChild(sakura);
+
+        setTimeout(() => {
+            sakura.remove();
+        }, 10000);
+    }
+
+    setInterval(createSakura, 300);
+</script>
+
+
+
+</body>
+</html>

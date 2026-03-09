@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+  <title>Edit Product</title>
+
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+  <style>
+    .image-preview {
+      width: 220px;
+      height: 180px;
+      border: 1px dashed #ccc;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fafafa;
+      overflow: hidden;
+    }
+
+    .image-preview img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .sale-box {
+      display: none;
+      background: #fff3f3;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ffc9c9;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+<section layout:fragment="content" class="container mt-5">
+
+  <h3 class="mb-4">✏️ Chỉnh sửa sản phẩm</h3>
+
+  <form th:action="@{/products/update/{id}(id=${product.id})}"
+        th:object="${product}"
+        method="post"
+        enctype="multipart/form-data"
+        class="row g-4">
+
+    <!-- LEFT -->
+    <div class="col-md-7">
+
+      <div class="mb-3">
+        <label class="form-label">Tên sản phẩm</label>
+        <input type="text" th:field="*{name}"
+               class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Giá bán</label>
+        <input type="number" th:field="*{price}"
+               class="form-control" required>
+      </div>
+
+      <!-- SALE STATUS -->
+      <div class="mb-3">
+        <label class="form-label">Trạng thái Sale</label>
+        <select th:field="*{sale}" class="form-select" id="saleSelect">
+          <option th:value="false">Không Sale</option>
+          <option th:value="true">Sale</option>
+        </select>
+      </div>
+
+      <!-- SALE PRICE BOX -->
+      <div id="saleFields" class="sale-box">
+
+        <div class="mb-3">
+          <label class="form-label">Giá gốc</label>
+          <input type="number"
+                 th:field="*{originalPrice}"
+                 class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Giá hiện tại</label>
+          <input type="number"
+                 th:field="*{salePrice}"
+                 class="form-control">
+        </div>
+
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Danh mục</label>
+        <select th:field="*{category}" class="form-select">
+          <option th:each="category : ${categories}"
+                  th:value="${category.id}"
+                  th:text="${category.name}">
+          </option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Mô tả</label>
+        <textarea th:field="*{description}"
+                  class="form-control" rows="4"></textarea>
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col-md-5">
+
+      <label class="form-label">Ảnh sản phẩm</label>
+
+      <div class="image-preview mb-2">
+        <img id="previewImage"
+             th:src="@{/images/products/{img}(img=${product.image})}"
+             onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+      </div>
+
+      <input type="file"
+             name="imageFile"
+             class="form-control"
+             accept="image/*"
+             onchange="previewFile(this)">
+
+      <input type="hidden" th:field="*{image}">
+
+      <small class="text-muted">
+        Chỉ chọn ảnh mới nếu muốn thay đổi
+      </small>
+
+    </div>
+
+    <!-- BUTTON -->
+    <div class="col-12 mt-3">
+      <button type="submit" class="btn btn-primary">
+        💾 Lưu thay đổi
+      </button>
+      <a th:href="@{/products}" class="btn btn-secondary">
+        Hủy
+      </a>
+    </div>
+
+  </form>
+
+  <!-- SCRIPT PHẢI NẰM TRONG FRAGMENT -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+      const saleSelect = document.getElementById("saleSelect");
+      const saleFields = document.getElementById("saleFields");
+
+      function toggleSaleFields() {
+        saleFields.style.display =
+                saleSelect.value === "true" ? "block" : "none";
+      }
+
+      toggleSaleFields();
+      saleSelect.addEventListener("change", toggleSaleFields);
+    });
+
+    function previewFile(input) {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          document.getElementById('previewImage').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  </script>
+
+</section>
+</body>
+</html>

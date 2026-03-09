@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+  <title>Danh sách sản phẩm</title>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <style>
+    .product-card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      transition: all 0.2s ease;
+      height: 100%;
+      position: relative;
+    }
+
+    .product-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+    }
+
+    /* 🔥 SALE BADGE */
+    .sale-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #d0021c;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .product-image {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fafafa;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .product-image img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .product-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      min-height: 44px;
+      margin-top: 8px;
+    }
+
+    .product-category {
+      font-size: 0.85rem;
+      color: #777;
+    }
+
+    .product-price {
+      color: #d0021c;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin: 6px 0;
+    }
+  </style>
+</head>
+
+<body>
+<section layout:fragment="content">
+
+  <!-- HEADER -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>📱 Danh sách sản phẩm</h4>
+    <a th:href="@{/products/add}" class="btn btn-dark">
+      <i class="bi bi-plus-circle"></i> Thêm sản phẩm
+    </a>
+  </div>
+
+
+  <!-- ================= SALE PRODUCTS ================= -->
+  <h5 class="mb-3 text-danger fw-bold">🔥 Sản phẩm đang SALE</h5>
+
+  <div class="row g-3 mb-5">
+
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6"
+         th:each="product : ${products}"
+         th:if="${product.sale}">
+
+      <div class="product-card">
+
+        <div class="sale-badge">
+          SALE
+        </div>
+
+        <!-- IMAGE -->
+        <div class="product-image mb-2">
+          <img th:if="${product.image != null}"
+               th:src="@{'/images/products/' + ${product.image}}"
+               onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+        </div>
+
+        <!-- NAME -->
+        <div class="product-name"
+             th:text="${product.name}">
+        </div>
+
+        <!-- CATEGORY -->
+        <div class="product-category">
+          Danh mục:
+          <span th:text="${product.category.name}"></span>
+        </div>
+
+        <!-- PRICE SALE -->
+        <div class="product-price">
+
+          <!-- Giá giảm -->
+          <div style="color:#d0021c; font-weight:bold; font-size:1.1rem;">
+            <span th:text="${#numbers.formatDecimal(product.salePrice,0,'COMMA',0,'POINT')}"></span> ₫
+          </div>
+
+          <!-- Giá gốc -->
+          <div style="text-decoration: line-through; color:#888; font-size:0.9rem;">
+            <span th:text="${#numbers.formatDecimal(product.originalPrice,0,'COMMA',0,'POINT')}"></span> ₫
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <!-- ================= NORMAL PRODUCTS ================= -->
+  <h5 class="mb-3 fw-bold">🛍 Sản phẩm không SALE</h5>
+
+  <div class="row g-3">
+
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6"
+         th:each="product : ${products}"
+         th:if="${!product.sale}">
+
+      <div class="product-card">
+
+        <!-- IMAGE -->
+        <div class="product-image mb-2">
+          <img th:if="${product.image != null}"
+               th:src="@{'/images/products/' + ${product.image}}"
+               onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+        </div>
+
+        <!-- NAME -->
+        <div class="product-name"
+             th:text="${product.name}">
+        </div>
+
+        <!-- CATEGORY -->
+        <div class="product-category">
+          Danh mục:
+          <span th:text="${product.category.name}"></span>
+        </div>
+
+        <!-- PRICE NORMAL -->
+        <div class="product-price text-dark">
+          <span th:text="${#numbers.formatDecimal(product.price,0,'COMMA',0,'POINT')}"></span> ₫
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</section>
+</body>
+</html>

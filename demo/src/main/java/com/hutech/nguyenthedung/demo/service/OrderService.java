@@ -19,20 +19,27 @@ public class OrderService {
     @Autowired
     private OrderDetailRepository orderDetailRepository;
     @Autowired
-    private CartService cartService; // Assuming you have a CartService
+    private CartService cartService;
+    @Autowired
+    private ProductService productService;
+
     @Transactional
     public Order createOrder(String customerName, List<CartItem> cartItems) {
         Order order = new Order();
         order.setCustomerName(customerName);
         order = orderRepository.save(order);
+
         for (CartItem item : cartItems) {
             OrderDetail detail = new OrderDetail();
             detail.setOrder(order);
             detail.setProduct(item.getProduct());
             detail.setQuantity(item.getQuantity());
             orderDetailRepository.save(detail);
+
+            // Gọi logic tắt sale nếu hết số lượng khuyến mãi
+            productService.checkAndDisableSale(item.getProduct().getId(), item.getQuantity());
         }
-        // Optionally clear the cart after order placement
+
         cartService.clearCart();
         return order;
     }

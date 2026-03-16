@@ -22,21 +22,30 @@ public class OrderController {
     private CartService cartService;
 
     // ================= CHECKOUT =================
-    @GetMapping("/checkout")
-    public String checkout(Model model, HttpSession session) {
+    @PostMapping("/checkout")
+    public String processCheckout(@RequestParam String customerName, Model model) {
+        // Lấy thông tin từ CartService trước khi thanh toán
+        double totalPrice = cartService.getTotalPrice();
+        double shippingFee = cartService.calculateShippingFee();
+        double finalTotal = cartService.getFinalTotal();
 
-        List<CartItem> cartItems = cartService.getCartItems();
-        model.addAttribute("cartItems", cartItems);
+        // Giả sử logic tích điểm: 100.000đ = 1 điểm
+        int pointsEarned = (int) (finalTotal / 100000);
 
-        Integer points = (Integer) session.getAttribute("loyaltyPoints");
-        if (points == null) {
-            points = 0;
-            session.setAttribute("loyaltyPoints", 0);
-        }
+        // Lưu đơn hàng vào DB qua OrderService (đã bao gồm logic trừ kho sale)
+        orderService.createOrder(customerName, cartService.getCartItems());
 
-        model.addAttribute("points", points);
+        // Truyền dữ liệu sang trang xác nhận
+        model.addAttribute("totalPrice", totalPrice);
+        model.addAttribute("shippingFee", shippingFee);
+        model.addAttribute("finalTotal", finalTotal);
+        model.addAttribute("points", pointsEarned);
+        model.addAttribute("customerName", customerName);
 
-        return "cart/checkout";
+        // Xóa giỏ hàng
+        cartService.clearCart();
+
+        return "cart/order-confirmation";
     }
 
     // ================= SUBMIT ORDER =================

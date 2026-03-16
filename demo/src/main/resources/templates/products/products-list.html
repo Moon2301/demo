@@ -7,7 +7,6 @@
 <head>
   <title>Danh sách sản phẩm</title>
 
-  <!-- Bootstrap Icons -->
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
@@ -20,6 +19,8 @@
       transition: all 0.2s ease;
       height: 100%;
       position: relative;
+      display: flex;
+      flex-direction: column;
     }
 
     .product-card:hover {
@@ -27,7 +28,6 @@
       transform: translateY(-2px);
     }
 
-    /* 🔥 SALE BADGE */
     .sale-badge {
       position: absolute;
       top: 8px;
@@ -38,9 +38,10 @@
       font-weight: 600;
       padding: 4px 8px;
       border-radius: 4px;
+      z-index: 1;
     }
 
-    .product-image {
+    .product-img {
       height: 180px;
       display: flex;
       align-items: center;
@@ -50,7 +51,7 @@
       overflow: hidden;
     }
 
-    .product-image img {
+    .product-img img {
       max-height: 100%;
       max-width: 100%;
       object-fit: contain;
@@ -66,13 +67,30 @@
     .product-category {
       font-size: 0.85rem;
       color: #777;
+      margin-bottom: 2px;
+    }
+
+    /* 🔥 CSS CHO Ô SỐ LƯỢNG SALE */
+    .sale-quantity {
+      font-size: 0.85rem;
+      color: #d0021c;
+      font-weight: 500;
+      margin-bottom: 5px;
     }
 
     .product-price {
       color: #d0021c;
       font-weight: bold;
       font-size: 1.1rem;
-      margin: 6px 0;
+      margin-bottom: 12px;
+    }
+
+    .admin-actions {
+      margin-top: auto;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 10px;
+      display: flex;
+      gap: 5px;
     }
   </style>
 </head>
@@ -80,107 +98,97 @@
 <body>
 <section layout:fragment="content">
 
-  <!-- HEADER -->
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4>📱 Danh sách sản phẩm</h4>
-    <a th:href="@{/products/add}" class="btn btn-dark">
-      <i class="bi bi-plus-circle"></i> Thêm sản phẩm
+    <h4 class="fw-bold">📱 Hệ thống quản lý sản phẩm</h4>
+    <a th:href="@{/products/add}" class="btn btn-dark btn-sm">
+      <i class="bi bi-plus-circle"></i> Thêm sản phẩm mới
     </a>
   </div>
 
-
-  <!-- ================= SALE PRODUCTS ================= -->
-  <h5 class="mb-3 text-danger fw-bold">🔥 Sản phẩm đang SALE</h5>
-
+  <h5 class="mb-3 text-danger fw-bold"><i class="bi bi-fire"></i> Sản phẩm đang SALE</h5>
   <div class="row g-3 mb-5">
-
     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6"
          th:each="product : ${products}"
          th:if="${product.sale}">
+      <div class="product-card shadow-sm">
+        <div class="sale-badge">SALE</div>
 
-      <div class="product-card">
-
-        <div class="sale-badge">
-          SALE
+        <div class="product-img">
+          <img th:src="@{'/images/' + ${product.image}}"
+               onerror="this.src='https://via.placeholder.com/200x200?text=No+Image'">
         </div>
 
-        <!-- IMAGE -->
-        <div class="product-image mb-2">
-          <img th:if="${product.image != null}"
-               th:src="@{'/images/products/' + ${product.image}}"
-               onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
-        </div>
+        <div class="product-name" th:text="${product.name}"></div>
 
-        <!-- NAME -->
-        <div class="product-name"
-             th:text="${product.name}">
-        </div>
-
-        <!-- CATEGORY -->
         <div class="product-category">
-          Danh mục:
-          <span th:text="${product.category.name}"></span>
+          <i class="bi bi-tag"></i> <span th:text="${product.category.name}"></span>
         </div>
 
-        <!-- PRICE SALE -->
-        <div class="product-price">
+        <div class="sale-quantity">
+          <i class="bi bi-lightning-fill"></i> Còn lại:
+          <span class="fw-bold" th:text="${product.saleQuantity}">0</span> sản phẩm
+        </div>
 
-          <!-- Giá giảm -->
-          <div style="color:#d0021c; font-weight:bold; font-size:1.1rem;">
+        <div class="product-price">
+          <div class="text-danger">
             <span th:text="${#numbers.formatDecimal(product.salePrice,0,'COMMA',0,'POINT')}"></span> ₫
           </div>
-
-          <!-- Giá gốc -->
-          <div style="text-decoration: line-through; color:#888; font-size:0.9rem;">
+          <div style="text-decoration: line-through; color:#888; font-size:0.85rem;">
             <span th:text="${#numbers.formatDecimal(product.originalPrice,0,'COMMA',0,'POINT')}"></span> ₫
           </div>
-
         </div>
 
+        <div class="admin-actions">
+          <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-outline-warning btn-sm flex-fill">
+            <i class="bi bi-pencil-square"></i> Sửa
+          </a>
+          <a th:href="@{/products/delete/{id}(id=${product.id})}"
+             class="btn btn-outline-danger btn-sm flex-fill"
+             onclick="return confirm('Học trò có chắc muốn xóa sản phẩm này không?')">
+            <i class="bi bi-trash"></i> Xóa
+          </a>
+        </div>
       </div>
     </div>
-
   </div>
 
-
-
-  <!-- ================= NORMAL PRODUCTS ================= -->
-  <h5 class="mb-3 fw-bold">🛍 Sản phẩm không SALE</h5>
-
+  <h5 class="mb-3 fw-bold"><i class="bi bi-box-seam"></i> Sản phẩm không SALE</h5>
   <div class="row g-3">
-
     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6"
          th:each="product : ${products}"
          th:if="${!product.sale}">
-
-      <div class="product-card">
-
-        <!-- IMAGE -->
-        <div class="product-image mb-2">
-          <img th:if="${product.image != null}"
-               th:src="@{'/images/products/' + ${product.image}}"
-               onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+      <div class="product-card shadow-sm">
+        <div class="product-img">
+          <img th:src="@{'/images/' + ${product.image}}"
+               onerror="this.src='https://via.placeholder.com/200x200?text=No+Image'">
         </div>
 
-        <!-- NAME -->
-        <div class="product-name"
-             th:text="${product.name}">
-        </div>
+        <div class="product-name" th:text="${product.name}"></div>
 
-        <!-- CATEGORY -->
         <div class="product-category">
-          Danh mục:
-          <span th:text="${product.category.name}"></span>
+          <i class="bi bi-tag"></i> <span th:text="${product.category.name}"></span>
         </div>
 
-        <!-- PRICE NORMAL -->
+        <div class="sale-quantity text-muted" style="color: #999;">
+          Hàng phổ thông
+        </div>
+
         <div class="product-price text-dark">
           <span th:text="${#numbers.formatDecimal(product.price,0,'COMMA',0,'POINT')}"></span> ₫
         </div>
 
+        <div class="admin-actions">
+          <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-outline-warning btn-sm flex-fill">
+            <i class="bi bi-pencil-square"></i> Sửa
+          </a>
+          <a th:href="@{/products/delete/{id}(id=${product.id})}"
+             class="btn btn-outline-danger btn-sm flex-fill"
+             onclick="return confirm('Học trò có chắc muốn xóa sản phẩm này không?')">
+            <i class="bi bi-trash"></i> Xóa
+          </a>
+        </div>
       </div>
     </div>
-
   </div>
 
 </section>

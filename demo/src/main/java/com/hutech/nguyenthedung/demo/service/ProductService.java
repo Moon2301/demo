@@ -4,6 +4,7 @@ import com.hutech.nguyenthedung.demo.model.Product;
 import com.hutech.nguyenthedung.demo.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,5 +62,21 @@ public class ProductService {
         Product product = productRepository.findById(id).orElseThrow();
         product.setSale(false);
         productRepository.save(product);
+    }
+
+    @Transactional
+    public void checkAndDisableSale(Long productId, int quantitySold) {
+        Product product = productRepository.findById(productId).orElseThrow();
+        if (Boolean.TRUE.equals(product.getSale()) && product.getSaleQuantity() != null) {
+            int newQuantity = product.getSaleQuantity() - quantitySold;
+
+            if (newQuantity <= 0) {
+                product.setSale(false); // Tắt chế độ sale
+                product.setSaleQuantity(0);
+            } else {
+                product.setSaleQuantity(newQuantity);
+            }
+            productRepository.save(product);
+        }
     }
 }

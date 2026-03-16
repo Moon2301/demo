@@ -313,8 +313,13 @@
             <a th:href="@{/login}">
                 <i class="bi bi-person"></i> Đăng nhập
             </a>
-            <a th:href="@{/cart}">
+            <a th:href="@{/cart}" class="position-relative">
                 <i class="bi bi-cart"></i> Giỏ hàng
+                <span id="cart-count"
+                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      th:text="${session.cartService != null ? session.cartService.totalQuantity : 0}">
+              0
+        </span>
             </a>
             <a href="#">
                 <i class="bi bi-geo-alt"></i> Hồ Chí Minh

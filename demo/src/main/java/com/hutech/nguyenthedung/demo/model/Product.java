@@ -35,6 +35,8 @@ public class Product {
     @Column(name = "is_sale")
     private Boolean sale = false;
 
-    private Double originalPrice;   // giá gốc
+    private Double originalPrice;
+
+    private Integer saleQuantity = 0;
 
 }

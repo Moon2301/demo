@@ -74,8 +74,15 @@
         </select>
       </div>
 
-      <!-- SALE PRICE BOX -->
       <div id="saleFields" class="sale-box">
+
+        <div class="mb-3">
+          <label class="form-label fw-bold text-danger">Số lượng Sale còn lại</label>
+          <input type="number"
+                 th:field="*{saleQuantity}"
+                 class="form-control border-danger">
+          <small class="text-muted">Chỉnh về 0 nếu muốn kết thúc đợt Sale này ngay lập tức.</small>
+        </div>
 
         <div class="mb-3">
           <label class="form-label">Giá gốc</label>
@@ -85,7 +92,7 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Giá hiện tại</label>
+          <label class="form-label">Giá hiện tại (Sale Price)</label>
           <input type="number"
                  th:field="*{salePrice}"
                  class="form-control">

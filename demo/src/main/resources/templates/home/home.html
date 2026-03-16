@@ -1,279 +1,188 @@
 <!DOCTYPE html>
-<html lang="vi"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
-
 <head>
-    <title>Trang chủ</title>
-
+    <title>Trang chủ - Flash Sale</title>
     <style>
+        .container-main { max-width: 1200px; margin: auto; padding: 20px 0; }
 
-        .container-main {
-            max-width: 1200px;
-            margin: auto;
-        }
-
+        /* SALE SECTION */
         .sale-section {
-            background: linear-gradient(90deg,#ff0000,#c40000);
+            background: linear-gradient(135deg, #ed1c24, #aa0000);
             padding: 30px;
             border-radius: 20px;
             color: white;
             margin-bottom: 50px;
-        }
-
-        .flash-title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(237, 28, 36, 0.3);
         }
 
         .product-card {
             background: white;
             border-radius: 15px;
             padding: 15px;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             height: 100%;
+            border: 1px solid #eee;
+            color: #333;
         }
 
         .product-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
         }
 
-        .product-img {
-            height: 180px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        .product-img { height: 180px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
+        .product-img img { max-height: 100%; max-width: 100%; object-fit: contain; }
 
-        .product-img img {
-            max-height: 100%;
-            max-width: 100%;
-            object-fit: contain;
-        }
+        /* PRICE STYLES */
+        .price-new { color: #d0021c; font-weight: 800; font-size: 20px; }
+        .price-old { text-decoration: line-through; color: #333; font-size: 14px; margin-left: 8px; }
+        .sale-stock { color: #d0021c; font-size: 13px; font-weight: bold; margin-bottom: 10px; display: block; }
 
-        .price-new {
-            color: #d0021c;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .price-old {
-            text-decoration: line-through;
-            color: gray;
-            font-size: 14px;
-        }
-
-        .buy-btn {
-            background: #ffcc00;
+        /* NÚT VÀNG HIỆU ỨNG ĐẸP */
+        .buy-btn-yellow {
+            background: linear-gradient(180deg, #ffde00, #ffc400);
             border: none;
             width: 100%;
+            padding: 10px;
             font-weight: bold;
-            border-radius: 10px;
+            border-radius: 12px;
+            color: #000;
+            transition: all 0.2s active;
+            box-shadow: 0 4px 0 #b78a00; /* Hiệu ứng 3D */
+            position: relative;
+            top: 0;
         }
 
-        .buy-btn:hover {
-            background: orange;
+        .buy-btn-yellow:hover {
+            background: linear-gradient(180deg, #ffeb3b, #ffda00);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #b78a00;
         }
 
-        .section-title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 25px;
+        .buy-btn-yellow:active {
+            top: 4px; /* Lún xuống khi bấm */
+            box-shadow: 0 0px 0 #b78a00;
         }
 
-        .sakura {
-            position: fixed;
-            top: -10px;
-            font-size: 20px;
-            pointer-events: none;
-            animation: fall linear infinite;
-            z-index: 9999;
-        }
-
-        @keyframes fall {
-            0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-        }
-
-        .countdown-bar {
-            background: rgba(255,255,255,0.15);
-            padding: 10px 20px;
-            border-radius: 30px;
-            display: inline-block;
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-
-        .countdown-bar span {
-            background: #fff;
-            color: #d0021c;
-            padding: 4px 8px;
-            border-radius: 6px;
-            margin: 0 3px;
-            min-width: 30px;
-            display: inline-block;
-            text-align: center;
-        }
+        .section-title { font-size: 24px; font-weight: bold; margin-bottom: 25px; border-left: 5px solid #ffc400; padding-left: 15px; }
 
     </style>
 </head>
-
 <body>
-
 <section layout:fragment="content">
-
     <div class="container-main">
 
-        <!-- ================= SALE SECTION ================= -->
         <div class="sale-section">
-
-            <div class="countdown-bar">
-                ⏰ Kết thúc sau:
-                <span id="hours">01</span> :
-                <span id="minutes">00</span> :
-                <span id="seconds">00</span>
-            </div>
-
-            <div class="flash-title">
-                ⚡ SẢN PHẨM ĐANG SALE
-            </div>
-
-            <div class="row g-4">
-
-                <div class="col-6 col-md-4 col-lg-3"
-                     th:each="p : ${saleProducts}">
-
-                    <div class="product-card">
-
-                        <div class="product-img">
-                            <img th:src="@{/images/products/{img}(img=${p.image})}"
-                                 onerror="this.src='https://via.placeholder.com/200x200'">
-                        </div>
-
-                        <h6 class="fw-bold mt-2"
-                            th:text="${p.name}">
-                        </h6>
-
-                        <div class="price-new"
-                             th:text="${#numbers.formatDecimal(p.salePrice,0,'COMMA',0,'POINT')} + ' ₫'">
-                        </div>
-
-                        <div class="price-old"
-                             th:text="${#numbers.formatDecimal(p.originalPrice,0,'COMMA',0,'POINT')} + ' ₫'">
-                        </div>
-
-                        <!-- ADD TO CART -->
-                        <form th:action="@{/cart/add}" method="post" class="mt-2">
-                            <input type="hidden" name="productId" th:value="${p.id}" />
-                            <input type="hidden" name="quantity" value="1" />
-                            <button type="submit" class="btn buy-btn">
-                                🛒 Thêm vào giỏ hàng
-                            </button>
-                        </form>
-
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ================= NORMAL PRODUCTS ================= -->
-        <div>
-
-            <div class="section-title">
-                🛍 SẢN PHẨM KHÔNG SALE
-            </div>
-
-            <div class="row g-4">
-
-                <div class="col-6 col-md-4 col-lg-3"
-                     th:each="p : ${normalProducts}">
-
-                    <div class="product-card">
-
-                        <div class="product-img">
-                            <img th:src="@{/images/products/{img}(img=${p.image})}"
-                                 onerror="this.src='https://via.placeholder.com/200x200'">
-                        </div>
-
-                        <h6 class="fw-bold mt-2"
-                            th:text="${p.name}">
-                        </h6>
-
-                        <div class="price-new text-dark"
-                             th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')} + ' ₫'">
-                        </div>
-
-                        <!-- ADD TO CART -->
-                        <form th:action="@{/cart/add}" method="post" class="mt-2">
-                            <input type="hidden" name="productId" th:value="${p.id}" />
-                            <input type="hidden" name="quantity" value="1" />
-                            <button type="submit" class="btn buy-btn">
-                                🛒 Thêm vào giỏ hàng
-                            </button>
-                        </form>
-
-                    </div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="flash-title h3 mb-0">⚡ SẢN PHẨM ĐANG SALE</div>
+                <div id="countdown" class="badge bg-white text-danger p-2 fs-6">
+                    Kết thúc sau: <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
                 </div>
             </div>
 
+            <div class="row g-4">
+                <div class="col-6 col-md-4 col-lg-3" th:each="p : ${saleProducts}">
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img th:src="@{'/images/' + ${p.image}}" onerror="this.src='https://via.placeholder.com/200x200'">
+                        </div>
+                        <h6 class="fw-bold text-truncate" th:text="${p.name}"></h6>
+
+                        <div class="d-flex align-items-baseline">
+                            <span class="price-new" th:text="${#numbers.formatDecimal(p.salePrice,0,'COMMA',0,'POINT')} + ' ₫'"></span>
+                            <span class="price-old" th:text="${#numbers.formatDecimal(p.originalPrice,0,'COMMA',0,'POINT')} + ' ₫'"></span>
+                        </div>
+
+                        <span class="sale-stock">
+                             🔥 Chỉ còn <span th:text="${p.saleQuantity}">0</span> sản phầm khuyến mại
+                        </span>
+
+                        <div class="mt-auto">
+                            <input type="hidden" class="cart-product-id" th:value="${p.id}" />
+                            <button type="button" class="buy-btn-yellow ajax-add-to-cart">
+                                🛒 THÊM VÀO GIỎ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <div class="mt-5">
+            <div class="section-title">🛍 SẢN PHẨM MỚI</div>
+            <div class="row g-4">
+                <div class="col-6 col-md-4 col-lg-3" th:each="p : ${normalProducts}">
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img th:src="@{'/images/' + ${p.image}}" onerror="this.src='https://via.placeholder.com/200x200'">
+                        </div>
+                        <h6 class="fw-bold text-truncate" th:text="${p.name}"></h6>
+                        <div class="price-new text-dark" th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')} + ' ₫'"></div>
+
+                        <span class="sale-stock text-muted" style="visibility: hidden;">Duy trì layout</span>
+
+                        <div class="mt-2">
+                            <input type="hidden" class="cart-product-id" th:value="${p.id}" />
+                            <button type="button" class="buy-btn-yellow ajax-add-to-cart">
+                                🛒 THÊM VÀO GIỎ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            const buyButtons = document.querySelectorAll('.ajax-add-to-cart');
 
-            const h = document.getElementById("hours");
-            const m = document.getElementById("minutes");
-            const s = document.getElementById("seconds");
+            buyButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const productId = this.parentElement.querySelector('.cart-product-id').value;
+                    const formData = new FormData();
+                    formData.append('productId', productId);
+                    formData.append('quantity', 1);
 
-            if (!h || !m || !s) return;
+                    fetch('/cart/add', { method: 'POST', body: formData })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            const cartCount = document.getElementById('cart-count');
+                            if (cartCount) {
+                                cartCount.innerText = data.totalItems;
+                                cartCount.classList.add('animate__animated', 'animate__bounce');
+                                setTimeout(() => cartCount.classList.remove('animate__animated', 'animate__bounce'), 1000);
+                            }
+                            // Hiệu ứng nút bấm thành công
+                            this.innerHTML = "✅ ĐÃ THÊM";
+                            this.style.background = "#4caf50";
+                            this.style.boxShadow = "0 4px 0 #2e7d32";
+                            setTimeout(() => {
+                                this.innerHTML = "🛒 THÊM VÀO GIỎ";
+                                this.style.background = "";
+                                this.style.boxShadow = "";
+                            }, 1500);
+                        }
+                    });
+                });
+            });
 
-            let time = 3600;
-
-            setInterval(function () {
-                let hours = Math.floor(time / 3600);
-                let minutes = Math.floor((time % 3600) / 60);
-                let seconds = time % 60;
-
-                h.textContent = hours.toString().padStart(2, '0');
-                m.textContent = minutes.toString().padStart(2, '0');
-                s.textContent = seconds.toString().padStart(2, '0');
-
-                if (time > 0) time--;
-
+            // Countdown Timer
+            let time = 7200; // 2 tiếng
+            const h = document.getElementById("hours"), m = document.getElementById("minutes"), s = document.getElementById("seconds");
+            setInterval(() => {
+                if (h && m && s) {
+                    h.innerText = Math.floor(time / 3600).toString().padStart(2, '0');
+                    m.innerText = Math.floor((time % 3600) / 60).toString().padStart(2, '0');
+                    s.innerText = (time % 60).toString().padStart(2, '0');
+                    if (time > 0) time--;
+                }
             }, 1000);
         });
     </script>
-
 </section>
-
-<script>
-    function createSakura() {
-        const sakura = document.createElement("div");
-        sakura.classList.add("sakura");
-        sakura.innerHTML = "🌸";   // emoji hoa anh đào
-
-        sakura.style.left = Math.random() * window.innerWidth + "px";
-        sakura.style.animationDuration = (Math.random() * 5 + 5) + "s";
-
-        document.body.appendChild(sakura);
-
-        setTimeout(() => {
-            sakura.remove();
-        }, 10000);
-    }
-
-    setInterval(createSakura, 300);
-</script>
-
-
 </body>
 </html>

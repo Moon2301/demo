@@ -59,19 +59,30 @@ public class CartService {
         cartItems.clear();
     }
 
-    /** Tổng số lượng sản phẩm */
     public int getTotalQuantity() {
         return cartItems.stream()
                 .mapToInt(CartItem::getQuantity)
                 .sum();
     }
 
-    /** Tổng tiền giỏ hàng */
     public double getTotalPrice() {
         return cartItems.stream()
                 .mapToDouble(item ->
                         item.getProduct().getPrice() * item.getQuantity()
                 )
                 .sum();
+    }
+
+    public double calculateShippingFee() {
+        double currentTotal = getTotalPrice();
+        int totalQuantity = getTotalQuantity();
+        if (totalQuantity >= 2 && currentTotal > 1000000) {
+            return 0;
+        }
+        return 30000;
+    }
+
+    public double getFinalTotal() {
+        return getTotalPrice() + calculateShippingFee();
     }
 }

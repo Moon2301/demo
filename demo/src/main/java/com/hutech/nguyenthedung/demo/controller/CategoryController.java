@@ -4,7 +4,9 @@ import com.hutech.nguyenthedung.demo.model.Category;
 import com.hutech.nguyenthedung.demo.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value; // Thêm import này
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +20,10 @@ import java.nio.file.*;
 public class CategoryController {
 
     private final CategoryService categoryService;
+
+    // Khai báo duy nhất một lần ở đây để dùng chung cho cả class
+    @Value("${upload.path}")
+    private String uploadPath;
 
     /* ================= SHARE CATEGORY FOR LAYOUT ================= */
     @ModelAttribute("categories")
@@ -33,7 +39,7 @@ public class CategoryController {
 
     /* ================= FORM ADD ================= */
     @GetMapping("/add")
-    public String showAddForm(org.springframework.ui.Model model) {
+    public String showAddForm(Model model) {
         model.addAttribute("category", new Category());
         return "categories/add-category";
     }
@@ -44,7 +50,7 @@ public class CategoryController {
             @Valid @ModelAttribute("category") Category category,
             BindingResult result,
             @RequestParam("iconFile") MultipartFile iconFile,
-            org.springframework.ui.Model model) {
+            Model model) {
 
         if (result.hasErrors()) {
             return "categories/add-category";
@@ -52,23 +58,23 @@ public class CategoryController {
 
         try {
             if (!iconFile.isEmpty()) {
-
                 String fileName = System.currentTimeMillis()
                         + "_" + iconFile.getOriginalFilename().replaceAll("\\s+", "_");
 
-                Path uploadDir = Paths.get("src/upload/static/images/categories/");
-                Files.createDirectories(uploadDir);
+                // Sử dụng uploadPath đã cấu hình thay vì src/...
+                Path staticPath = Paths.get(uploadPath, "/category");
+                if (!Files.exists(staticPath)) {
+                    Files.createDirectories(staticPath);
+                }
 
-                Path filePath = uploadDir.resolve(fileName);
+                Path filePath = staticPath.resolve(fileName);
                 Files.copy(iconFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
                 category.setIconPath(fileName);
             }
-
             categoryService.addCategory(category);
-
         } catch (IOException e) {
-            model.addAttribute("error", "Lỗi upload icon");
+            model.addAttribute("error", "Lỗi upload icon: " + e.getMessage());
             return "categories/add-category";
         }
 
@@ -77,15 +83,11 @@ public class CategoryController {
 
     /* ================= FORM UPDATE ================= */
     @GetMapping("/update/{id}")
-    public String showUpdateForm(@PathVariable Long id,
-                                 org.springframework.ui.Model model) {
-
+    public String showUpdateForm(@PathVariable Long id, Model model) {
         Category category = categoryService.getCategoryById(id);
-
         if (category == null) {
             return "redirect:/categories";
         }
-
         model.addAttribute("category", category);
         return "categories/update-category";
     }
@@ -97,7 +99,7 @@ public class CategoryController {
             @Valid @ModelAttribute("category") Category formCategory,
             BindingResult result,
             @RequestParam("iconFile") MultipartFile iconFile,
-            org.springframework.ui.Model model) {
+            Model model) {
 
         if (result.hasErrors()) {
             return "categories/update-category";
@@ -105,7 +107,6 @@ public class CategoryController {
 
         try {
             Category existingCategory = categoryService.getCategoryById(id);
-
             if (existingCategory == null) {
                 return "redirect:/categories";
             }
@@ -113,21 +114,21 @@ public class CategoryController {
             existingCategory.setName(formCategory.getName());
 
             if (!iconFile.isEmpty()) {
-
                 String fileName = System.currentTimeMillis()
                         + "_" + iconFile.getOriginalFilename().replaceAll("\\s+", "_");
 
-                Path uploadDir = Paths.get("target/classes/static/images/category/");
-                Files.createDirectories(uploadDir);
+                // Thống nhất dùng chung một thư mục lưu trữ ngoài project
+                Path staticPath = Paths.get(uploadPath, "/category");
+                if (!Files.exists(staticPath)) {
+                    Files.createDirectories(staticPath);
+                }
 
-                Path filePath = uploadDir.resolve(fileName);
+                Path filePath = staticPath.resolve(fileName);
                 Files.copy(iconFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
                 existingCategory.setIconPath(fileName);
             }
-
             categoryService.updateCategory(existingCategory);
-
         } catch (IOException e) {
             model.addAttribute("error", "Lỗi upload icon");
             return "categories/update-category";
@@ -139,25 +140,19 @@ public class CategoryController {
     /* ================= DELETE ================= */
     @GetMapping("/delete/{id}")
     public String deleteCategory(@PathVariable Long id) {
-
         Category category = categoryService.getCategoryById(id);
-
         if (category != null) {
-
-            // Xóa file icon nếu tồn tại
             if (category.getIconPath() != null) {
                 try {
-                    Path filePath = Paths.get("target/classes/static/images/category/")
-                            .resolve(category.getIconPath());
+                    // Xóa file tại thư mục cấu hình ngoài project
+                    Path filePath = Paths.get(uploadPath, "category").resolve(category.getIconPath());
                     Files.deleteIfExists(filePath);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-
             categoryService.deleteCategoryById(id);
         }
-
         return "redirect:/categories";
     }
 }

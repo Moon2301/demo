@@ -74,11 +74,18 @@
             </label>
           </div>
 
-          <!-- SALE PRICE BOX -->
           <div id="saleFields" class="sale-box">
 
             <div class="mb-3">
-              <label class="form-label">Giá gốc</label>
+              <label class="form-label fw-bold text-danger">Số lượng hàng Sale giới hạn</label>
+              <input type="number"
+                     th:field="*{saleQuantity}"
+                     class="form-control border-danger"
+                     placeholder="Ví dụ: 10 (Hết 10 sản phẩm sẽ tự tắt Sale)">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Giá gốc (Chưa giảm)</label>
               <input type="number"
                      th:field="*{originalPrice}"
                      class="form-control"
